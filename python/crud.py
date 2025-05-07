@@ -12,6 +12,7 @@ def conectar():
         database="db"
     )
 
+# Funções para filmes
 def inserir_filme():
     titulo = input("Título: ")
     diretor_id = input("ID do Diretor: ")
@@ -51,7 +52,6 @@ def atualizar_filme():
     conn = conectar()
     cursor = conn.cursor()
 
-    # Busca o filme atual
     cursor.execute("SELECT titulo, diretor_id, genero_id, ano_lancamento, classificacao_indicativa FROM filmes WHERE id = %s", (id_filme,))
     resultado = cursor.fetchone()
 
@@ -79,7 +79,6 @@ def atualizar_filme():
     print("Filme atualizado com sucesso!\n")
     conn.close()
 
-
 def deletar_filme():
     id_filme = input("ID do filme a deletar: ")
     conn = conectar()
@@ -89,28 +88,157 @@ def deletar_filme():
     print("Filme deletado com sucesso!\n")
     conn.close()
 
+# Funções para diretores
+def inserir_diretor():
+    nome = input("Nome do Diretor: ")
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO diretores (nome) VALUES (%s)", (nome,))
+    conn.commit()
+    print("Diretor inserido com sucesso!\n")
+    conn.close()
+
+def listar_diretores():
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nome FROM diretores")
+    diretores = cursor.fetchall()
+    print("\n--- Lista de Diretores ---")
+    for d in diretores:
+        print(f"ID: {d[0]}, Nome: {d[1]}")
+    print()
+    conn.close()
+
+def atualizar_diretor():
+    id_diretor = input("ID do Diretor a atualizar: ")
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("SELECT nome FROM diretores WHERE id = %s", (id_diretor,))
+    resultado = cursor.fetchone()
+
+    if not resultado:
+        print("Diretor não encontrado.\n")
+        conn.close()
+        return
+
+    nome_atual = resultado[0]
+    novo_nome = input(f"Novo nome ({nome_atual}): ") or nome_atual
+
+    cursor.execute("UPDATE diretores SET nome = %s WHERE id = %s", (novo_nome, id_diretor))
+    conn.commit()
+    print("Diretor atualizado com sucesso!\n")
+    conn.close()
+
+def deletar_diretor():
+    id_diretor = input("ID do Diretor a deletar: ")
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM diretores WHERE id = %s", (id_diretor,))
+    conn.commit()
+    print("Diretor deletado com sucesso!\n")
+    conn.close()
+
+# Funções para gêneros
+def inserir_genero():
+    nome = input("Nome do Gênero: ")
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO generos (nome) VALUES (%s)", (nome,))
+    conn.commit()
+    print("Gênero inserido com sucesso!\n")
+    conn.close()
+
+def listar_generos():
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, nome FROM generos")
+    generos = cursor.fetchall()
+    print("\n--- Lista de Gêneros ---")
+    for g in generos:
+        print(f"ID: {g[0]}, Nome: {g[1]}")
+    print()
+    conn.close()
+
+def atualizar_genero():
+    id_genero = input("ID do Gênero a atualizar: ")
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("SELECT nome FROM generos WHERE id = %s", (id_genero,))
+    resultado = cursor.fetchone()
+
+    if not resultado:
+        print("Gênero não encontrado.\n")
+        conn.close()
+        return
+
+    nome_atual = resultado[0]
+    novo_nome = input(f"Novo nome ({nome_atual}): ") or nome_atual
+
+    cursor.execute("UPDATE generos SET nome = %s WHERE id = %s", (novo_nome, id_genero))
+    conn.commit()
+    print("Gênero atualizado com sucesso!\n")
+    conn.close()
+
+def deletar_genero():
+    id_genero = input("ID do Gênero a deletar: ")
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM generos WHERE id = %s", (id_genero,))
+    conn.commit()
+    print("Gênero deletado com sucesso!\n")
+    conn.close()
+
+# Menu principal
 def menu():
     while True:
-        print("==== MENU CRUD ====")
-        print("1. Inserir novo filme")
-        print("2. Listar todos os filmes")
-        print("3. Atualizar filme por ID")
-        print("4. Deletar filme por ID")
+        print("==== MENU ====")
+        print("1. Inserir")
+        print("2. Listar")
+        print("3. Atualizar")
+        print("4. Deletar")
         print("5. Sair")
 
-        escolha = input("Escolha uma opção: ")
+        acao = input("Escolha uma ação: ")
 
-        if escolha == '1':
-            inserir_filme()
-        elif escolha == '2':
-            listar_filmes()
-        elif escolha == '3':
-            atualizar_filme()
-        elif escolha == '4':
-            deletar_filme()
-        elif escolha == '5':
+        if acao == '5':
             print("Encerrando...")
             break
+
+        print("\n== Em qual tabela? ==")
+        print("1. Filme")
+        print("2. Diretor")
+        print("3. Gênero")
+
+        tabela = input("Escolha a tabela: ")
+
+        if acao == '1': 
+            if tabela == '1':
+                inserir_filme()
+            elif tabela == '2':
+                inserir_diretor()
+            elif tabela == '3':
+                inserir_genero()
+        elif acao == '2':  
+            if tabela == '1':
+                listar_filmes()
+            elif tabela == '2':
+                listar_diretores()
+            elif tabela == '3':
+                listar_generos()
+        elif acao == '3':  
+            if tabela == '1':
+                atualizar_filme()
+            elif tabela == '2':
+                atualizar_diretor()
+            elif tabela == '3':
+                atualizar_genero()
+        elif acao == '4':  
+            if tabela == '1':
+                deletar_filme()
+            elif tabela == '2':
+                deletar_diretor()
+            elif tabela == '3':
+                deletar_genero()
         else:
             print("Opção inválida.\n")
 
