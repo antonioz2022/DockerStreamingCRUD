@@ -188,6 +188,24 @@ def deletar_genero():
     print("Gênero deletado com sucesso!\n")
     conn.close()
 
+def listar_qtd_filmes_por_diretor():
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT d.nome AS diretor, COUNT(f.id) AS total_filmes
+        FROM diretores d
+        LEFT JOIN filmes f ON d.id = f.diretor_id
+        GROUP BY d.nome
+    """)
+
+    resultados = cursor.fetchall()
+    print("\n--- Quantidade de Filmes por Diretor ---")
+    for diretor, total in resultados:
+        print(f"Diretor: {diretor} | Total de Filmes: {total}")
+    print()
+    conn.close()
+
 # Menu principal
 def menu():
     while True:
@@ -196,13 +214,17 @@ def menu():
         print("2. Listar")
         print("3. Atualizar")
         print("4. Deletar")
-        print("5. Sair")
+        print("5. Ver total de filmes por diretor")
+        print("6. Sair")
 
         acao = input("Escolha uma ação: ")
 
-        if acao == '5':
+        if acao == '6':
             print("Encerrando...")
             break
+        elif acao == '5':
+            listar_qtd_filmes_por_diretor()
+            continue
 
         print("\n== Em qual tabela? ==")
         print("1. Filme")
